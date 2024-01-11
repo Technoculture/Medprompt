@@ -16,9 +16,7 @@ from dspy.evaluate import Evaluate
 
 def model_setting(API_KEY, model_name):
 
-    api_key = os.environ.get(API_KEY)
-
-    model=dspy.OpenAI(model=model, api_key=api_key)
+    model=dspy.OpenAI(model=model, api_key=API_KEY)
     dspy.settings.configure(lm=model)
 
 def formatting_options(qoptions):

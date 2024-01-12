@@ -22,8 +22,16 @@ def model_setting(API_KEY, model_name):
 def formatting_options(qoptions):
   return [' '.join(f"{option['key']} {option['value']}" for option in options) for options in qoptions]
 
-# We are expecting a single choice answer so signature accordingly.
+# To be used for generating chain of thought which are to be stored.
 class MultipleChoiceQA(dspy.Signature):
+    """Answer questions with single letter answers."""
+
+    question = dspy.InputField(desc="The multiple-choice question.")
+    options = dspy.InputField(desc="The set of options in the format : A option1 B option2 C option3 D option4 E option5 where A corresponds to option1, B to option2 and so on.")
+    answer = dspy.OutputField(desc="A single-letter answer corresponding to the selected option.")
+
+# To be used for answering the test question.
+class MultipleChoiceQA1(dspy.Signature):
     """Answer questions with single letter answers."""
 
     question = dspy.InputField(desc="The multiple-choice question.")
@@ -31,18 +39,8 @@ class MultipleChoiceQA(dspy.Signature):
     context = dspy.InputField(desc="may contain relevant facts")
     answer = dspy.OutputField(desc="A single-letter answer corresponding to the selected option.")
 
-class MultipleQABot(dspy.Module):
-    def __init__(self):
-        super().__init__()
-        self.generate_answer = dspy.Predict(MultipleChoiceQA)
-
-    def forward(self, question, options):
-        answer = self.generate_answer(question=question,options=options)
-
-        return answer
 
 generate_answer = dspy.ChainOfThought(MultipleChoiceQA)
-
 def store_correct_cot(questions: list[str], option_sets: list[str], answers: list[str]) -> list[str]:
     train_set = []
     for question, options, answer in zip(questions, option_sets, answers):
@@ -59,6 +57,15 @@ def store_correct_cot(questions: list[str], option_sets: list[str], answers: lis
 
     return train_set
 
+class MultipleQABot(dspy.Module):
+    def __init__(self):
+        super().__init__()
+        self.generate_answer = dspy.Predict(MultipleChoiceQA1)
+
+    def forward(self, question, options):
+        answer = self.generate_answer(question=question,options=options)
+
+        return answer
 
 
 class Ensemble(Teleprompter):

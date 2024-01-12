@@ -16,11 +16,25 @@ from dspy.evaluate import Evaluate
 
 def model_setting(API_KEY, model_name):
 
-    model=dspy.OpenAI(model=model, api_key=API_KEY)
+    model=dspy.OpenAI(model=model_name, api_key=API_KEY)
     dspy.settings.configure(lm=model)
-
+# Formatting functions for different datsets.
+#MedQA
 def formatting_options(qoptions):
   return [' '.join(f"{option['key']} {option['value']}" for option in options) for options in qoptions]
+
+def convert_format(input_options: list[dict]):
+    result = []
+    
+    for dictionary in input_options:
+        converted_list = []
+        
+        for key, value in sorted(dictionary.items()):
+            converted_list.append({'key': key, 'value': value})
+        
+        result.append(converted_list)
+    
+    return result
 
 # To be used for generating chain of thought which are to be stored.
 class MultipleChoiceQA(dspy.Signature):
@@ -105,7 +119,7 @@ def ask_questions(program):
         if q.lower() == 'exit':
             break
 
-        o = input("Provide the options in the format A option1 B option2 C option3 and so on.\n")
+        o = input("Please provide the options.\n")
         pred = program(question=q, options=o)
         print(pred.answer)   
 
@@ -116,11 +130,18 @@ def main(args):
     dataset: DatasetDict = (load_dataset(args.dataset))
 
     #Processing datset
-    train_subset = dataset.get("Train",[])
-    train_questions = train_subset.get("question",[])
-    train_options = train_subset.get("options",[])
-    train_answers_id = train_subset.get("answer_idx",[])
-    formatted_train_options = formatting_options(train_options)
+    train_subset = dataset["train"]
+    train_questions = train_subset["question"]
+    train_options = train_subset["options"]
+    train_answers_id = train_subset["answer_idx"]
+
+    #Formatting input data
+    if args.dataset == "GBaker/MedQA-USMLE-4-options":
+        formatted_train_options = formatting_options(convert_format(train_options))
+
+    if args.dataset == "bigbio/med_qa":
+        formatted_train_options = formatting_options(train_options)
+
 
     #Generating chain of thought
     trainset = store_correct_cot(train_questions, formatted_train_options, train_answers_id)

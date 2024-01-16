@@ -44,6 +44,24 @@ Model: gpt-3.5-turbo
 Dataset: bigbio/med_qa
 Shots: 5
 ```
+
+## Development
+
+```sh
+python medprompt.py --help
+```
+
+```sh
+# Use the virtual environment
+poetry shell
+
+# Format the code
+ruff format
+
+# Lint the code
+ruff check . --fix
+```
+
 ## Asking Questions
 
 The system will prompt you to ask questions, and you can provide options.

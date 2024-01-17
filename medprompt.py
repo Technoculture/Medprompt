@@ -1,6 +1,66 @@
 import argparse
 from datasets import DatasetDict, load_dataset
 import dspy
+import random
+from dspy.teleprompt import KNNFewShot
+from dspy.predict.knn import KNN
+from dspy.teleprompt.teleprompt import Teleprompter
+
+
+<<<<<<< REPLACE (index=1)
+class MultipleChoiceQA(dspy.Signature):
+    """Answer questions with single letter answers."""
+
+    question = dspy.InputField(desc="The multiple-choice question.")
+    options = dspy.InputField(
+        desc="The set of options in the format : A option1 B option2 C option3 D option4 E option5 where A corresponds to option1, B to option2 and so on."
+    )
+    answer = dspy.OutputField(
+        desc="A single-letter answer corresponding to the selected option."
+    )
+
+
+class MultipleChoiceQA1(dspy.Signature):
+    """Answer questions with single letter answers."""
+
+    question = dspy.InputField(desc="The multiple-choice question.")
+    options = dspy.InputField(
+        desc="The set of options in the format : A option1 B option2 C option3 D option4 E option5 where A corresponds to option1, B to option2 and so on."
+    )
+    context = dspy.InputField(desc="may contain relevant facts")
+=======
+import argparse
+from datasets import DatasetDict, load_dataset
+import dspy
+import openai
+import faiss
+import tqdm
+import random
+from dspy.teleprompt import KNNFewShot
+from dspy.predict.knn import KNN
+from dspy.teleprompt.teleprompt import Teleprompter
+
+
+class MultipleChoiceQA(dspy.Signature):
+    """Answer questions with single letter answers."""
+
+    question = dspy.InputField(desc="The multiple-choice question.")
+    options = dspy.InputField(
+        desc="The set of options in the format : A option1 B option2 C option3 D option4 E option5 where A corresponds to option1, B to option2 and so on."
+    )
+    answer = dspy.OutputField(
+        desc="A single-letter answer corresponding to the selected option."
+    )
+
+
+class MultipleChoiceQA1(dspy.Signature):
+    """Answer questions with single letter answers."""
+
+    question = dspy.InputField(desc="The multiple-choice question.")
+    options = dspy.InputField(
+        desc="The set of options in the format : A option1 B option2 C option3 D option4 E option5 where A corresponds to option1, B to option2 and so on."
+    )
+    context = dspy.InputField(desc="may contain relevant facts")
 <<<<<<< HEAD
 import openai
 import faiss

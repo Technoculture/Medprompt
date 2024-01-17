@@ -2,11 +2,9 @@ import argparse
 from datasets import DatasetDict, load_dataset
 import dspy
 import openai
-import os
 import faiss
 import tqdm
 import random
-import joblib
 from dspy.teleprompt import KNNFewShot
 from dspy.predict.knn import KNN
 from dspy.teleprompt.teleprompt import Teleprompter
@@ -14,9 +12,14 @@ from dspy.evaluate.evaluate import Evaluate
 from dspy.evaluate import Evaluate
 
 
-def model_setting(API_KEY, model_name):
+def model_setting(model_name, API_KEY):
 
     model=dspy.OpenAI(model=model_name, api_key=API_KEY)
+    dspy.settings.configure(lm=model)
+
+def hfmodel_setting(model_name):
+
+    model=dspy.HFModel(model=model_name)
     dspy.settings.configure(lm=model)
 # Formatting functions for different datsets.
 #MedQA
@@ -124,7 +127,11 @@ def ask_questions(program):
         print(pred.answer)   
 
 def main(args):
-    model_setting(args.api_key,args.model)
+
+    if args.model == "gpt-3.5-turbo" or args.model == "gpt-4":
+        model_setting(args.model, args.api_key)
+    else:
+        hfmodel_setting(args.model)
     
     #Loading the dataset
     dataset: DatasetDict = (load_dataset(args.dataset))
@@ -161,7 +168,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type= str, default="gpt-3.5-turbo", help="Model to be used.")
-    parser.add_argument("--dataset", type=str, default="bigbio/med_qa")
+    parser.add_argument("--dataset", type=str, default="GBaker/MedQA-USMLE-4-options")
     parser.add_argument("--api_key", type=str, help="YOUR_API_KEY")
     parser.add_argument("--shots", type=int, default=5,
                         help="Number of shots for knn fewshot.")

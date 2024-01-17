@@ -1,0 +1,5 @@
+datasets==2.14.6
+dspy-ai @ git+https://github.com/stanfordnlp/dspy.git@f94861f5e226b694851f67030030253aec7110e3
+faiss-cpu==1.7.4
+openai==0.28.1
+tqdm==4.66.1
